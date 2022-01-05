@@ -14,4 +14,8 @@ public class MockQuestionRepository implements QuestionRepository {
         QUESTIONS.add(new Question("Kolik je 0+1?", Arrays.asList("1", "2", "4", "10"), "1"));
     }
 
+    @Override
+    public Question getOneQuestion() {
+        return QUESTIONS.get(0);
+    }
 }
