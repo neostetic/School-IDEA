@@ -4,13 +4,29 @@ import cz.polacek.millionar.model.Question;
 import cz.polacek.millionar.repository.MockQuestionRepository;
 import cz.polacek.millionar.repository.QuestionRepository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GameUI {
 
     private static final int ADD_MONEY = 1000;
+    private static final Map<Integer, Integer> PRICE_MAP;
+
+    static {
+        PRICE_MAP = new HashMap<>();
+
+        int round = 0;
+        PRICE_MAP.put(round++, 0);
+        PRICE_MAP.put(round++, 1_000);
+        PRICE_MAP.put(round++, 2_000);
+        PRICE_MAP.put(round++, 5_000);
+        PRICE_MAP.put(round++, 10_000);
+        PRICE_MAP.put(round++, 20_000);
+    }
 
     private int currentScore;
+    private int currentRound = 0;
     private Question currentQuestion;
     private QuestionRepository questionRepository;
 
@@ -26,11 +42,13 @@ public class GameUI {
             showNewQuestion();
             isCorrectAnswer = isCorrectAnswer();
             if (isCorrectAnswer) {
-                this.currentScore += ADD_MONEY;
+                this.currentRound++;
+                // this.currentScore += PRICE_MAP.get(this.currentScore);
             }
         } while (isCorrectAnswer && getQuestionRepository().hasNextQuestion());
 
-        System.out.println("Uživatel vyhrál: " + this.currentScore);
+        // System.out.println("Uživatel vyhrál: " + this.currentScore);
+        System.out.println("Uživatel vyhrál: " + PRICE_MAP.get(this.currentRound));
     }
 
     private boolean isCorrectAnswer() {
