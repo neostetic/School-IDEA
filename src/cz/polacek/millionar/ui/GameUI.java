@@ -1,7 +1,6 @@
 package cz.polacek.millionar.ui;
 
 import cz.polacek.millionar.model.Question;
-import cz.polacek.millionar.repository.MockQuestionRepository;
 import cz.polacek.millionar.repository.QuestionRepository;
 
 import java.util.HashMap;
@@ -10,87 +9,80 @@ import java.util.Scanner;
 
 public class GameUI {
 
-    private static final int ADD_MONEY = 1000;
-    private static final Map<Integer, Integer> PRICE_MAP;
+    private static Map<Integer, Integer> PRICE_MAP;
 
     static {
         PRICE_MAP = new HashMap<>();
-
         int round = 0;
+
         PRICE_MAP.put(round++, 0);
+        PRICE_MAP.put(round++, 100);
+        PRICE_MAP.put(round++, 200);
+        PRICE_MAP.put(round++, 300);
+        PRICE_MAP.put(round++, 500);
         PRICE_MAP.put(round++, 1_000);
         PRICE_MAP.put(round++, 2_000);
         PRICE_MAP.put(round++, 5_000);
         PRICE_MAP.put(round++, 10_000);
-        PRICE_MAP.put(round++, 20_000);
+        PRICE_MAP.put(round++, 25_000);
+        PRICE_MAP.put(round++, 69_000);
+        PRICE_MAP.put(round++, 100_000);
     }
 
-    private int currentScore;
-    private int currentRound = 0;
+
+    private final Scanner scanner = new Scanner(System.in);
+
     private Question currentQuestion;
+    private int currentRound;
     private QuestionRepository questionRepository;
 
-    public GameUI(QuestionRepository QuestionRepository) {
-        this.questionRepository = QuestionRepository;
+    public GameUI(QuestionRepository questionRepository) {
+        this.questionRepository = questionRepository;
     }
 
     public void startGame() {
-        this.currentScore = 0;
-        boolean isCorrectAnswer = false;
+        this.currentRound = 0;
+        boolean isCorrectAnswer;
         do {
-            genNewQuestion();
-            showNewQuestion();
-            isCorrectAnswer = isCorrectAnswer();
-            if (isCorrectAnswer) {
-                this.currentRound++;
-                // this.currentScore += PRICE_MAP.get(this.currentScore);
+            genQuestion();
+            showQuestion();
+            isCorrectAnswer = checkAnswer();
+            if(isCorrectAnswer) {
+                currentRound++;
             }
-        } while (isCorrectAnswer && getQuestionRepository().hasNextQuestion());
+        } while (isCorrectAnswer && getQuestionRepository().hasNextQuestion() && currentRound < PRICE_MAP.size() - 1);
 
-        // System.out.println("Uživatel vyhrál: " + this.currentScore);
-        System.out.println("Uživatel vyhrál: " + PRICE_MAP.get(this.currentRound));
+        currentRound = (currentRound < PRICE_MAP.size())? currentRound: currentRound - 1;
+        System.out.println("Vyhavas: $" + (PRICE_MAP.get(currentRound)));
     }
 
-    private boolean isCorrectAnswer() {
-        System.out.print("Zadej odpověď: ");
-        String userAnswer = new Scanner(System.in).nextLine();
-        return getCurrentQuestion().getCorrectAnswer().compareTo(userAnswer) == 0;
+    private boolean checkAnswer() {
+        System.out.print("Zadej odpoved: ");
+        String answer = scanner.nextLine();
+        return answer.compareTo(getCurrentQuestion().getCorrectAnswer()) == 0;
     }
 
-    private void genNewQuestion() {
-        this.currentQuestion = getQuestionRepository().getOneQuestion();
-    }
-
-    private void showNewQuestion() {
-        System.out.println(this.getCurrentQuestion().getQuestion());
-        for (int i = 0; i < this.getCurrentQuestion().getOptions().size(); i++) {
-            String option = this.getCurrentQuestion().getOptions().get(i);
-            System.out.println(i + " - " + option);
+    private void showQuestion() {
+        System.out.println(getCurrentQuestion().getQuestion());
+        for(int i = 0; i < getCurrentQuestion().getOptions().size(); i++) {
+            String option = getCurrentQuestion().getOptions().get(i);
+            System.out.println(i + 1 + " - " + option);
         }
     }
 
-
-    public int getCurrentScore() {
-        return currentScore;
-    }
-
-    public void setCurrentScore(int currentScore) {
-        this.currentScore = currentScore;
+    private void genQuestion() {
+        this.currentQuestion = getQuestionRepository().getOneQuestion();
     }
 
     public Question getCurrentQuestion() {
         return currentQuestion;
     }
 
-    public void setCurrentQuestion(Question currentQuestion) {
-        this.currentQuestion = currentQuestion;
+    public int getCurrentRound() {
+        return currentRound;
     }
 
     public QuestionRepository getQuestionRepository() {
         return questionRepository;
-    }
-
-    public void setQuestionRepository(QuestionRepository questionRepository) {
-        this.questionRepository = questionRepository;
     }
 }

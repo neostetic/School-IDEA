@@ -6,12 +6,15 @@ import java.util.*;
 
 public class MockQuestionRepository implements QuestionRepository {
 
-    public static final List<Question> QUESTIONS = new LinkedList<>();
+    private static final List<Question> QUESTION_LIST;
 
     static {
-        QUESTIONS.add(new Question("Kolik je 0+1?", Arrays.asList("1", "2", "4", "10"), "1"));
-        QUESTIONS.add(new Question("Kolik je 1+1?", Arrays.asList("1", "2", "4", "10"), "2"));
-        QUESTIONS.add(new Question("Kolik je 2+2?", Arrays.asList("1", "2", "4", "10"), "4"));
+        QUESTION_LIST = new LinkedList<>();
+
+        QUESTION_LIST.add(new Question("Kolik je 1 + 1?", Arrays.asList("1", "2", "5", "10"), "2"));
+        QUESTION_LIST.add(new Question("Kolik je 2 + 2?", Arrays.asList("1", "2", "4", "10"), "4"));
+        QUESTION_LIST.add(new Question("Kolik je 3 + 3?", Arrays.asList("1", "2", "6", "10"), "6"));
+        QUESTION_LIST.add(new Question("Kolik je 3 + 6?", Arrays.asList("1", "2", "9", "10"), "9"));
     }
 
     private Set<Question> usedQuestions;
@@ -22,24 +25,24 @@ public class MockQuestionRepository implements QuestionRepository {
 
     @Override
     public Question getOneQuestion() {
-        Question question;
-        boolean containsQuestion;
+        Question newQuestion;
+        boolean isQuestionUsed;
         do {
-            question = QUESTIONS.get(getRandomQuestion());
-            containsQuestion = usedQuestions.contains(question);
-        } while (containsQuestion);
+            newQuestion = QUESTION_LIST.get(getRandomIndex());
+            isQuestionUsed = usedQuestions.contains(newQuestion);
+        } while (isQuestionUsed);
 
-        usedQuestions.add(question);
-
-        return question;
+        usedQuestions.add(newQuestion);
+        return newQuestion;
     }
 
     @Override
     public boolean hasNextQuestion() {
-        return usedQuestions.size() != QUESTIONS.size();
+        return usedQuestions.size() != QUESTION_LIST.size();
     }
 
-    private int getRandomQuestion() {
-        return (int) (Math.random() * QUESTIONS.size());
+    private int getRandomIndex() {
+        return (int) (Math.random() * QUESTION_LIST.size());
     }
+
 }
